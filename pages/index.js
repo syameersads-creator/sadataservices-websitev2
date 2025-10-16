@@ -1,3 +1,4 @@
+import ThankYouPopup from "../components/ThankyouPopup";
 import { useState, useEffect } from "react";
 import {
   motion,
@@ -488,6 +489,7 @@ export default function Home() {
             ↑ Back to Top
           </button>
         </footer>
+        <ThankYouPopup />
       </motion.main>
     </AnimatePresence>
   );
