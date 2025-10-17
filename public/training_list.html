@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <title>SADS — Training Catalog</title>
+
+    <!-- Inter font -->
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Tailwind config to set Inter as default font
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      /* Smooth scroll & modal body lock helper */
+      html { scroll-behavior: smooth; }
+      body.modal-open { overflow: hidden; }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-900 font-sans">
+    <!-- Header -->
+    <header
+      class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-3">
+          <img
+            src="/logo.png"
+            alt="S&A Data Services"
+            class="h-9 w-9 rounded"
+          />
+          <div class="leading-tight">
+            <h1 class="text-lg font-semibold tracking-tight">
+              S&amp;A Data Services
+            </h1>
+            <p class="text-xs text-slate-500">
+              Training Catalog &amp; Booking
+            </p>
+          </div>
+        </div>
+
+        <a
+          href="/v5"
+          class="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+          >Back to Website</a
+        >
+      </div>
+    </header>
+
+    <!-- Hero / Controls -->
+    <section class="bg-gradient-to-b from-indigo-600 to-indigo-500 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <div
+          class="rounded-2xl bg-white/10 ring-1 ring-white/15 shadow-xl p-6"
+        >
+          <div class="mb-4">
+            <h2 class="text-2xl font-bold">Training &amp; Workshops</h2>
+            <p class="text-indigo-100">
+              Explore our upcoming sessions. Filter by category or search by
+              keywords. Book instantly via TidyCal.
+            </p>
+          </div>
+
+          <div
+            class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between"
+          >
+            <!-- Search -->
+            <label class="w-full md:w-2/3">
+              <span class="sr-only">Search trainings</span>
+              <div
+                class="flex items-center gap-2 bg-white rounded-xl shadow ring-1 ring-slate-200 px-3 py-2.5"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-slate-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m21 21-4.35-4.35m0 0a7.5 7.5 0 1 0-10.61 0 7.5 7.5 0 0 0 10.61 0Z"
+                  />
+                </svg>
+                <input
+                  id="search-input"
+                  type="text"
+                  placeholder="Search title, description, category..."
+                  class="w-full bg-transparent outline-none placeholder-slate-400 text-slate-800"
+                />
+              </div>
+            </label>
+
+            <!-- Category -->
+            <label class="w-full md:w-1/3">
+              <span class="sr-only">Filter by category</span>
+              <select
+                id="category-filter"
+                class="w-full bg-white rounded-xl shadow ring-1 ring-slate-200 px-3 py-2.5 text-slate-800"
+              >
+                <!-- options populated dynamically -->
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalog -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div
+        id="training-list"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+      ></div>
+
+      <p
+        id="no-results"
+        class="hidden text-center text-slate-500 mt-10 text-sm"
+      >
+        No trainings match your filters. Try clearing the search or selecting a
+        different category.
+      </p>
+    </main>
+
+    <!-- Booking Modal -->
+    <div
+      id="booking-modal-overlay"
+      class="fixed inset-0 z-50 hidden"
+      aria-hidden="true"
+    >
+      <div
+        class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"
+        id="modal-bg"
+      ></div>
+
+      <div
+        class="absolute inset-0 flex items-center justify-center px-4 py-8"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="booking-modal-title"
+      >
+        <div
+        class="relative w-full max-w-[95%] sm:max-w-5xl bg-white rounded-2xl shadow-2xl ring-1 ring-slate-200"
+        >
+
+          <!-- Modal header -->
+          <div
+            class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-slate-200"
+          >
+            <h3
+              id="booking-modal-title"
+              class="text-lg font-semibold text-slate-900"
+            >
+              Book Training
+            </h3>
+            <button
+              id="modal-close-btn"
+              class="p-2 rounded-full hover:bg-slate-100"
+              aria-label="Close booking modal"
+              title="Close"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-slate-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6 18 18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="aspect-[3/4] sm:aspect-[16/9] md:aspect-[16/8]">
+            <iframe
+              id="tidycal-iframe"
+              src=""
+              title="TidyCal booking"
+              class="w-full h-full min-h-[80vh] rounded-b-2xl"
+              referrerpolicy="no-referrer"
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App Script -->
+    <script>
+      // -----------------------------
+      // Data & Config
+      // -----------------------------
+      const bookingBaseUrl = "https://tidycal.com/";
+
+      /** Mock trainings — extend/replace freely */
+      const allTrainings = [
+  {
+    id: 1,
+    title: "BIM Fundamentals Workshop",
+    category: "Technology",
+    duration: "1 day",
+    price: "RM 699",
+    description:
+      "A 1-day intensive introduction to BIM workflows, tools, and compliance in Malaysia.",
+    tidycalkey: "sads/bim-fundamentals",
+  },
+  {
+    id: 2,
+    title: "BIM–CDM Integration Training",
+    category: "Technology",
+    duration: "3 hours",
+    price: "RM 299",
+    description:
+      "How BIM and Construction Design Management integrate for project compliance and coordination.",
+    tidycalkey: "sads/bim-cdm-integration",
+  },
+  {
+    id: 3,
+    title: "Revit Modelling for Coordinators",
+    category: "Technology",
+    duration: "1 day",
+    price: "RM 799",
+    description:
+      "Hands-on session to create and manage Revit models for multidisciplinary coordination and clash detection.",
+    tidycalkey: "sads/revit-coordination",
+  },
+  {
+    id: 4,
+    title: "Leadership for Engineers",
+    category: "Soft Skills",
+    duration: "4 hours",
+    price: "RM 249",
+    description:
+      "Practical leadership tools for technical teams: decision-making, communication, ownership.",
+    tidycalkey: "pro-trainings/leadership-workshop",
+  },
+  {
+    id: 5,
+    title: "Technical Writing for Proposals",
+    category: "Soft Skills",
+    duration: "3 hours",
+    price: "RM 199",
+    description:
+      "Write clear scope, assumptions, and deliverables; improve client confidence and approvals.",
+    tidycalkey: "pro-trainings/tech-writing",
+  },
+  {
+    id: 6,
+    title: "AI Agents for Construction Analytics",
+    category: "Technology",
+    duration: "2 hours",
+    price: "RM 399",
+    description:
+      "Leverage AI agents to automate KPIs, risk alerts, and dashboard updates across projects.",
+    tidycalkey: "sads/ai-agents-construction",
+  },
+  {
+    id: 7,
+    title: "RV01 – Revit For Working Professionals",
+    category: "Technology",
+    duration: "3 hours",
+    price: "RM 499",
+    description:
+      "Kickstart your AEC career with this practical, project-based Revit training. Learn professional modeling workflows, documentation standards, BIM collaboration, and content management to prepare for real-world projects.",
+    tidycalkey: "sads/rvt01",
+  },
+];
+
+
+      // -----------------------------
+      // DOM Refs
+      // -----------------------------
+      const listEl = document.getElementById("training-list");
+      const noResultsEl = document.getElementById("no-results");
+      const searchEl = document.getElementById("search-input");
+      const categoryEl = document.getElementById("category-filter");
+
+      const modalOverlay = document.getElementById("booking-modal-overlay");
+      const modalCloseBtn = document.getElementById("modal-close-btn");
+      const modalBg = document.getElementById("modal-bg");
+      const modalTitle = document.getElementById("booking-modal-title");
+      const tidycalIframe = document.getElementById("tidycal-iframe");
+
+      // -----------------------------
+      // Modal Logic
+      // -----------------------------
+      function openBookingModal(tidycalkey, title) {
+        if (!tidycalkey) return;
+        tidycalIframe.src = bookingBaseUrl + tidycalkey;
+        modalTitle.textContent = "Book: " + (title || "Training");
+        modalOverlay.classList.remove("hidden");
+        document.body.classList.add("modal-open");
+      }
+
+      function closeBookingModal() {
+        modalOverlay.classList.add("hidden");
+        document.body.classList.remove("modal-open");
+        // optional: unload to stop background audio/processing
+        tidycalIframe.src = "";
+      }
+
+      // Close handlers
+      modalCloseBtn.addEventListener("click", closeBookingModal);
+      modalBg.addEventListener("click", closeBookingModal);
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeBookingModal();
+      });
+
+      // Expose for inline usage if needed
+      window.openBookingModal = openBookingModal;
+      window.closeBookingModal = closeBookingModal;
+
+      // -----------------------------
+      // Rendering
+      // -----------------------------
+      function renderTrainings(trainings) {
+        listEl.innerHTML = "";
+        if (!trainings || trainings.length === 0) {
+          noResultsEl.classList.remove("hidden");
+          return;
+        }
+        noResultsEl.classList.add("hidden");
+
+        const fragment = document.createDocumentFragment();
+
+        trainings.forEach((t) => {
+          const card = document.createElement("article");
+          card.className =
+            "bg-white rounded-2xl shadow ring-1 ring-slate-200 overflow-hidden flex flex-col";
+
+          // Body
+          const body = document.createElement("div");
+          body.className = "p-5 flex-1 flex flex-col";
+
+          const title = document.createElement("h3");
+          title.className =
+            "text-lg font-semibold text-slate-900 leading-snug";
+          title.textContent = t.title;
+
+          const meta = document.createElement("div");
+          meta.className =
+            "mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500";
+          meta.innerHTML = `
+            <span class="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 px-2 py-1 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
+              ${t.duration}
+            </span>
+            <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-1 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a6 6 0 0 1 6 6v1.5a2.25 2.25 0 0 0 2.25 2.25h-16.5A2.25 2.25 0 0 0 6 14.25v-1.5a6 6 0 0 1 6-6Z"/></svg>
+              ${t.category}
+            </span>
+            <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-2.21 0-4 1.79-4 4v6h8v-6c0-2.21-1.79-4-4-4Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 14h8"/></svg>
+              ${t.price}
+            </span>
+          `;
+
+          const desc = document.createElement("p");
+          desc.className = "mt-3 text-sm text-slate-600";
+          desc.textContent = t.description;
+
+          body.appendChild(title);
+          body.appendChild(meta);
+          body.appendChild(desc);
+
+          // Footer
+          const footer = document.createElement("div");
+          footer.className =
+            "px-5 pb-5 pt-3 flex items-center justify-between";
+
+          const badge = document.createElement("span");
+          badge.className =
+            "text-xs font-medium text-indigo-700 bg-indigo-50 px-2 py-1 rounded";
+          badge.textContent = "Available";
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className =
+            "inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow";
+          btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 8h18M7 4h10M6 12h12M6 16h12M9 20h6"/>
+            </svg>
+            Book Now
+          `;
+          btn.addEventListener("click", () =>
+            openBookingModal(t.tidycalkey, t.title)
+          );
+
+          footer.appendChild(badge);
+          footer.appendChild(btn);
+
+          card.appendChild(body);
+          card.appendChild(footer);
+
+          fragment.appendChild(card);
+        });
+
+        listEl.appendChild(fragment);
+      }
+
+      // -----------------------------
+      // Filtering
+      // -----------------------------
+      function normalize(str) {
+        return (str || "").toString().toLowerCase().trim();
+      }
+
+      function filterAndRender() {
+        const query = normalize(searchEl.value);
+        const category = categoryEl.value;
+
+        const filtered = allTrainings.filter((t) => {
+          const matchesQuery =
+            !query ||
+            normalize(t.title).includes(query) ||
+            normalize(t.description).includes(query) ||
+            normalize(t.category).includes(query);
+
+          const matchesCategory =
+            !category || category === "all" || t.category === category;
+
+          return matchesQuery && matchesCategory;
+        });
+
+        renderTrainings(filtered);
+      }
+
+      // -----------------------------
+      // Init
+      // -----------------------------
+      document.addEventListener("DOMContentLoaded", () => {
+        // Build category options
+        const categories = Array.from(
+          new Set(allTrainings.map((t) => t.category))
+        ).sort();
+
+        categoryEl.innerHTML =
+          '<option value="all">All Categories</option>' +
+          categories.map((c) => `<option value="${c}">${c}</option>`).join("");
+
+        // Hook inputs
+        searchEl.addEventListener("input", filterAndRender);
+        categoryEl.addEventListener("change", filterAndRender);
+
+        // Initial render
+        filterAndRender();
+      });
+    </script>
+  </body>
+</html>
