@@ -84,101 +84,128 @@ export default function TrainingPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen text-gray-800">
-      <header className="bg-white p-6 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-indigo-700 mb-2">S&A Training Hub</h1>
-          <p className="text-gray-600 mb-4">
-            Explore professional trainings crafted for AEC professionals.
-          </p>
+      <header className="bg-white p-6 sticky top-0 z-40 shadow-sm border-b border-gray-100">
+  <div className="max-w-7xl mx-auto">
+    {/* === Top Branding Row === */}
+    <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
+      {/* Left: Logo + Titles */}
+      <div className="flex items-center gap-4">
+        {/* Company Logo */}
+        <img
+          src="/logo.png"
+          alt="S&A Data Services"
+          className="w-14 h-14 object-contain"
+        />
 
-          <input
-            type="text"
-            placeholder="Search courses..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 mb-3"
-          />
+        {/* Company Name & Subtitle */}
+        <div className="flex flex-col leading-tight">
+          <span className="text-xl font-semibold text-gray-800">
+            S&amp;A Data Services
+          </span>
+          <span className="text-sm text-[#0097E6] font-medium tracking-wide">
+            Training Hub
+          </span>
+        </div>
+      </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-between flex-wrap items-center px-3 sm:px-0">
-            <div className="flex flex-col sm:flex-row gap-3 flex-wrap w-full">
-              {[
-                {
-                  label: "Softwares",
-                  key: "software",
-                  options: [
-                    "Autodesk Revit", "ChatGPT Canvas", "Gemini Canvas",
-                    "Microsoft Project", "VSCode", "Power BI", "n8n", "Navisworks", "Others",
-                  ],
-                },
-                { label: "Price", key: "priceType", options: ["Free", "Paid"] },
-                { label: "Training Type", key: "type", options: ["Physical", "Online", "e-Learning"] },
-              ].map(filter => (
+        {/* Right: Back to Main Website */}
+                  <a
+                    href="/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 sm:mt-0 px-5 py-2 rounded-full bg-[#0097E6] text-white font-medium shadow-md 
+                              hover:bg-[#007ACC] hover:shadow-lg transition-all duration-300"
+                  >
+                    ← Back to Main Website
+                  </a>
+    </div>
+
+    {/* === Search Bar === */}
+    <input
+      type="text"
+      placeholder="Search courses..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 mb-3"
+    />
+
+    {/* === Filters Section === */}
+    <div className="flex flex-col sm:flex-row gap-3 justify-between flex-wrap items-center px-3 sm:px-0">
+      <div className="flex flex-col sm:flex-row gap-3 flex-wrap w-full">
+        {[
+          {
+            label: "Softwares",
+            key: "software",
+            options: [
+              "Autodesk Revit", "ChatGPT Canvas", "Gemini Canvas",
+              "Microsoft Project", "VSCode", "Power BI", "n8n", "Navisworks", "Others",
+            ],
+          },
+          { label: "Price", key: "priceType", options: ["Free", "Paid"] },
+          { label: "Training Type", key: "type", options: ["Physical", "Online", "e-Learning"] },
+        ].map(filter => (
+          <div
+            key={filter.key}
+            ref={el => (dropdownRefs.current[filter.key] = el)}
+            className="relative w-full sm:w-auto flex-1"
+          >
+            <button
+              onClick={() => setOpenDropdown(openDropdown === filter.key ? null : filter.key)}
+              className="w-full px-4 py-3 rounded-full bg-white/80 backdrop-blur-md border border-gray-200 shadow-sm hover:bg-white flex justify-between items-center text-gray-700 font-medium transition"
+            >
+              {filter.label}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className={`w-4 h-4 transform transition-transform duration-200 ${openDropdown === filter.key ? "rotate-180" : ""}`}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <div
+              className={`absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg transition-all duration-200 transform origin-top ${
+                openDropdown === filter.key
+                  ? "scale-y-100 opacity-100 visible"
+                  : "scale-y-95 opacity-0 invisible"
+              }`}
+              onClick={(e) => e.stopPropagation()} // ✅ prevent closing on inner click
+            >
+              {filter.options.map(opt => (
                 <div
-                  key={filter.key}
-                  ref={el => (dropdownRefs.current[filter.key] = el)}
-                  className="relative w-full sm:w-auto flex-1"
+                  key={opt}
+                  onClick={() => toggleFilter(filter.key, opt)}
+                  className={`px-4 py-2 cursor-pointer hover:bg-indigo-50 ${
+                    filters[filter.key].includes(opt)
+                      ? "bg-indigo-100 text-indigo-700"
+                      : ""
+                  }`}
                 >
-                  <button
-                    onClick={() => setOpenDropdown(openDropdown === filter.key ? null : filter.key)}
-                    className="w-full px-4 py-3 rounded-full bg-white/80 backdrop-blur-md border border-gray-200 shadow-sm hover:bg-white flex justify-between items-center text-gray-700 font-medium transition"
-                  >
-                    {filter.label}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                      className={`w-4 h-4 transform transition-transform duration-200 ${openDropdown === filter.key ? "rotate-180" : ""}`}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  <div
-                    className={`absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg transition-all duration-200 transform origin-top ${
-                      openDropdown === filter.key
-                        ? "scale-y-100 opacity-100 visible"
-                        : "scale-y-95 opacity-0 invisible"
-                    }`}
-                    onClick={(e) => e.stopPropagation()} // ✅ prevent closing on inner click
-                  >
-                    {filter.options.map(opt => (
-                      <div
-                        key={opt}
-                        onClick={() => toggleFilter(filter.key, opt)}
-                        className={`px-4 py-2 cursor-pointer hover:bg-indigo-50 ${
-                          filters[filter.key].includes(opt)
-                            ? "bg-indigo-100 text-indigo-700"
-                            : ""
-                        }`}
-                      >
-                        {opt}
-                      </div>
-                    ))}
-                  </div>
+                  {opt}
                 </div>
               ))}
             </div>
-
-            <button
-            onClick={resetFilters}
-            className="
-                 w-full sm:w-auto px-6 py-3 rounded-full 
-                border border-gray-300 
-                bg-gradient-to-b from-white to-gray-50 
-                text-gray-700 font-medium 
-                shadow-sm hover:shadow-md 
-                hover:border-indigo-300 hover:text-indigo-600 
-                active:scale-[0.97] active:bg-indigo-50
-                transition-all duration-200 ease-in-out
-                "
-                    >
-                    🔄 Reset Filters
-                    </button>
           </div>
-        </div>
-      </header>
+        ))}
+      </div>
+
+      {/* Reset Filters Button */}
+      <button
+        onClick={resetFilters}
+        className="w-full sm:w-auto px-6 py-3 rounded-full border border-gray-300 
+                   bg-gradient-to-b from-white to-gray-50 text-gray-700 font-medium 
+                   shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-600 
+                   active:scale-[0.97] active:bg-indigo-50 transition-all duration-200 ease-in-out"
+      >
+        🔄 Reset Filters
+      </button>
+    </div>
+  </div>
+</header>
+
 
       <main className="max-w-7xl mx-auto p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredTrainings.map((t, i) => (
